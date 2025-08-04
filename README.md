@@ -1,1 +1,1 @@
-## Pothole detection in road using YOLOv8
+## Pothole Detection in Road using YOLOv8
