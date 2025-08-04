@@ -2,13 +2,11 @@
 __pycache__/
 *.py[codz]
 *$py.class
-Datasets/
-
 # Video files
 *.avi
-*.mp4
 # Uneccasary files
-runs/segment/val
+runs/
+Datasets/
 # C extensions
 *.so
 
