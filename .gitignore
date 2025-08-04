@@ -2,7 +2,13 @@
 __pycache__/
 *.py[codz]
 *$py.class
+Datasets/
 
+# Video files
+*.avi
+*.mp4
+# Uneccasary files
+runs/segment/val
 # C extensions
 *.so
 
@@ -143,7 +149,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
-
+pothole/
 # Spyder project settings
 .spyderproject
 .spyproject
