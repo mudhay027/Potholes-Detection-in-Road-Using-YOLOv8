@@ -147,7 +147,6 @@ venv/
 ENV/
 env.bak/
 venv.bak/
-pothole/
 # Spyder project settings
 .spyderproject
 .spyproject
