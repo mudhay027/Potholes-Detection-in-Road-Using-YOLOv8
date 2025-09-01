@@ -1,4 +1,7 @@
 numpy
 pandas
 yolo
+opencv-python
+ultralytics
+flask
 -e .

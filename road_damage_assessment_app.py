@@ -4,7 +4,7 @@ from ultralytics import YOLO
 from collections import deque
 
 # Load the best fine-tuned YOLOv8 model
-best_model = YOLO(r'runs\segment\train\weights\best.pt')
+best_model = YOLO(r'model\best.pt')
 # Define the video path
 video_path = 'sample_video.mp4'
 

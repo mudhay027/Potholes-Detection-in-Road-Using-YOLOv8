@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Pothole Detection 🚗</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background: linear-gradient(135deg, #71b4e3ff, #1c8cdbff);
+      color: #fff;
+      font-family: 'Segoe UI', sans-serif;
+      text-align: center;
+      padding: 50px;
+    }
+    .card {
+      background: rgba(255,255,255,0.15);
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0px 8px 25px rgba(0,0,0,0.3);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .card:hover {
+      transform: scale(1.02);
+      box-shadow: 0px 12px 30px rgba(0,0,0,0.4);
+    }
+    .progress {
+      height: 25px;
+      border-radius: 20px;
+      margin-top: 15px;
+    }
+    .btn-custom {
+      background: linear-gradient(90deg, #007BFF, #00C6FF);
+      color: white;
+      font-weight: bold;
+      border-radius: 50px;
+      padding: 12px 35px;
+      transition: all 0.3s ease-in-out;
+      border: none;
+      box-shadow: 0px 5px 15px rgba(0,0,0,0.2);
+    }
+    .btn-custom:hover {
+      background: linear-gradient(90deg, #0056b3, #0096c7);
+      box-shadow: 0px 8px 20px rgba(0,0,0,0.3);
+      transform: translateY(-2px);
+    }
+    #eta {
+      font-size: 16px;
+      margin-top: 10px;
+      color: #e0f7fa;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1 class="mb-4">Pothole Detection</h1>
+    <div class="card mx-auto" style="max-width: 650px;">
+      <form id="uploadForm" enctype="multipart/form-data">
+        <input class="form-control mb-3" type="file" name="video" accept="video/*" required>
+        <button type="submit" class="btn btn-custom">⬆ Upload & Process</button>
+      </form>
+
+      <!-- Upload status message -->
+      <div id="uploadStatus" class="mt-3"></div>
+
+      <!-- Processing status message -->
+      <div id="processingStatus" class="mt-3 d-none"></div>
+
+      <!-- Processing progress -->
+      <div id="processingProgress" class="progress mt-3 d-none">
+      <div id="processing-progress" class="progress-bar progress-bar-striped progress-bar-animated bg-success" role="progressbar" style="width:0%">0%</div>
+      </div>
+      <div id="eta" class="d-none">Estimated time remaining: -- sec</div>
+
+      <!-- Final result -->
+      <div id="resultSection" class="mt-4 d-none">
+        <h4>Processed Video 🎥</h4>
+        <video id="resultVideo" width="100%" autoplay controls></video>
+        <a id="downloadBtn" class="btn btn-custom mt-3" download>⬇ Download Video</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const form = document.getElementById("uploadForm");
+    const uploadProgress = document.getElementById("uploadProgress");
+    const processingProgress = document.getElementById("processingProgress");
+    const resultSection = document.getElementById("resultSection");
+    const resultVideo = document.getElementById("resultVideo");
+    const downloadBtn = document.getElementById("downloadBtn");
+    const eta = document.getElementById("eta");
+
+    form.addEventListener("submit", function(e){
+    e.preventDefault();
+    const formData = new FormData(form);
+    document.getElementById("uploadStatus").innerHTML =
+      `<div class="alert alert-info">⏳ Uploading file...</div>`;
+
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", "/upload", true);
+
+    xhr.onload = function(){
+      if (xhr.status == 200){
+        const response = JSON.parse(xhr.responseText);
+        document.getElementById("uploadStatus").innerHTML =
+          `<div class="alert alert-success">✅ File uploaded successfully!</div>`;
+
+        processingProgress.classList.remove("d-none");
+        eta.classList.remove("d-none");
+        document.getElementById("processingStatus").classList.remove("d-none");
+        document.getElementById("processingStatus").innerHTML =
+        `<div class="alert alert-warning">⚙️ Please wait, processing your video...</div>`;
+        checkProgress(response.result_file);
+      } else {
+        document.getElementById("uploadStatus").innerHTML =
+          `<div class="alert alert-danger">❌ Upload failed. Please try again.</div>`;
+      }
+    };
+
+    xhr.onerror = function(){
+      document.getElementById("uploadStatus").innerHTML =
+        `<div class="alert alert-danger">⚠️ Network error during upload.</div>`;
+    };
+
+    xhr.send(formData);
+    });
+
+
+    function checkProgress(filename) {
+      fetch('/progress')
+        .then(res => res.json())
+        .then(data => {
+          document.getElementById("processing-progress").style.width = data.processing + "%";
+          document.getElementById("processing-progress").textContent = data.processing + "%";
+
+          if (data.eta !== undefined) {
+            eta.textContent = "⏳ Remaining time: " + data.eta + " sec";
+          }
+
+          if (data.processing < 100) {
+            setTimeout(() => checkProgress(filename), 1000);
+          } else {
+            showResult(filename);
+          }
+        });
+    }
+
+    function showResult(filename){
+      resultSection.classList.remove("d-none");
+      resultVideo.src = `/static/results/${filename}?t=${Date.now()}`;
+      downloadBtn.href = `/download/${filename}`;
+      processingProgress.querySelector(".progress-bar").classList.remove("progress-bar-animated");
+      eta.textContent = "Processing complete 🎉";
+      document.getElementById("processingStatus").innerHTML =
+      `<div class="alert alert-success">✅ Processing completed successfully!</div>`;
+    }
+
+  </script>
+</body>
+</html>

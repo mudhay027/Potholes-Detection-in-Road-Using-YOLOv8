@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Processed Video</title>
+</head>
+<body>
+    <h1>Processed Video</h1>
+    <video controls autoplay width="640">
+    <source src="{{ url_for('static', filename='results/' + video_file) }}" type="video/mp4">
+    Your browser does not support the video tag.
+    </video>
+    <br>
+    <a href="{{ url_for('index') }}">Upload another video</a>
+</body>
+</html>
