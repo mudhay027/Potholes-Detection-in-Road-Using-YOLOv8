@@ -160,4 +160,4 @@ def process_video(input_path, output_path):
 
 if __name__ == "__main__":
     # For local testing only. On PythonAnywhere, WSGI runs the app.
-    app.run(debug=True)
+    app.run(host='0.0.0.0',debug=True)
